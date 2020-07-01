@@ -121,6 +121,9 @@ def main():
     scheduler = WarmupLinearSchedule(optimizer,
                                      warmup_steps=num_train_optimization_steps * 0.1,
                                      t_total=num_train_optimization_steps)
+    
+    loss_fn = nn.KLDivLoss(reduction='batchmean').to(device)
+
 
     if args.fp16:
         try:
@@ -152,8 +155,9 @@ def main():
             label = batch['label'].float().to(device)
             output = model(feature)
 
-            loss = -F.kl_div(output, label, reduction='batchmean')
+            # loss = -F.kl_div(output, label, reduction='batchmean')
 
+            loss = loss_fn(output, label)
             # if n_gpu > 1:
             #     loss = loss.mean()
 
