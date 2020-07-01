@@ -18,6 +18,7 @@ class SampleCNN(nn.Module):
             ConvBlock('gelu', 128, 128, 3, 3, 4, 0.15),
             ConvBlock('gelu', 128, 128, 3, 3, 4, 0.15),
             ConvBlock('gelu', 128, 128, 3, 3, 4, 0.15),
+            ConvBlock('gelu', 128, 128, 3, 3, 4, 0.15)
         )
 
         self.conv_seq_2 = nn.Sequential(
@@ -25,6 +26,7 @@ class SampleCNN(nn.Module):
             ConvBlock('gelu', 128, 128, 5, 3, 8, 0.15),
             ConvBlock('gelu', 128, 128, 5, 3, 8, 0.15),
             ConvBlock('gelu', 128, 128, 5, 3, 8, 0.15),
+            ConvBlock('gelu', 128, 128, 5, 3, 8, 0.15)
         )
         
         self.conv_seq_3 = nn.Sequential(
@@ -32,6 +34,7 @@ class SampleCNN(nn.Module):
             ConvBlock('gelu', 128, 128, 7, 3, 12, 0.15),
             ConvBlock('gelu', 128, 128, 7, 3, 12, 0.15),
             ConvBlock('gelu', 128, 128, 7, 3, 12, 0.15),
+            ConvBlock('gelu', 128, 128, 7, 3, 12, 0.15)
         )
 
         self.classifier = nn.Sequential(nn.Linear(in_features=384, out_features=192),
@@ -57,7 +60,7 @@ class SampleCNN(nn.Module):
 
         logits = self.classifier(features)
 
-        return F.softmax(logits, dim=1)
+        return F.log_softmax(logits, dim=1)
 
     def _init_weights(self, layer) -> None:
         if isinstance(layer, nn.Conv1d):

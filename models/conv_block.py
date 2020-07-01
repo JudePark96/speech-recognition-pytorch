@@ -17,7 +17,7 @@ class ConvBlock(nn.Module):
 
         self.sequential = nn.Sequential(
             self.conv,
-            self.bn,
+            #self.bn,
             self.act,
             self.dropout,
             self.max_pool
