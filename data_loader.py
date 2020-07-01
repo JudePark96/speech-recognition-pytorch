@@ -10,9 +10,8 @@ import pandas as pd
 
 
 class SpeechDataset(Dataset):
-    def __init__(self, file_path, answer_path) -> None:
+    def __init__(self, file_path) -> None:
         self.file_path = file_path
-        self.labels = torch.Tensor(pd.read_csv(answer_path, index_col=0).values)
 
         with h5py.File(file_path, 'r') as features_hdf:
             self.feature_keys = list(features_hdf.keys())
@@ -32,8 +31,33 @@ class SpeechDataset(Dataset):
 
         with h5py.File(self.file_path, 'r') as features_hdf:
             features['feature'] = features_hdf['feature'][index]
+            features['label'] = features_hdf['label'][index]
 
-        features['label'] = self.labels[index]
+        return features
+
+
+class SpeechTestDataset(Dataset):
+    def __init__(self, file_path) -> None:
+        self.file_path = file_path
+
+        with h5py.File(file_path, 'r') as features_hdf:
+            self.feature_keys = list(features_hdf.keys())
+            self.num_instances = features_hdf.get(self.feature_keys[0]).shape[0]
+
+        print(f'total instances is {self.num_instances}')
+
+    def __getitem__(self, index: int) -> dict:
+        features = self._read_hdf_features(index)
+        return features
+
+    def __len__(self) -> int:
+        return self.num_instances
+
+    def _read_hdf_features(self, index):
+        features = {}
+
+        with h5py.File(self.file_path, 'r') as features_hdf:
+            features['feature'] = features_hdf['feature'][index]
 
         return features
 

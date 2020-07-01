@@ -71,5 +71,8 @@ def read_hdf5(file_path) -> torch.Tensor:
 
 
 if __name__ == '__main__':
-    read_hdf5('rsc/train_features.hdf5')
+    # read_hdf5('rsc/train_features.hdf5')
+    # get_audio_dataset('./rsc/test/', './rsc/test_features.hdf5', 512, 400, 160, 80)
+
+    mel = get_mel_spectogram('./rsc/train/train_00109.wav', 512, 400, 160, 80)
 
