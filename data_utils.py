@@ -71,5 +71,5 @@ def read_hdf5(file_path) -> torch.Tensor:
 
 
 if __name__ == '__main__':
-    read_hdf5('./train_features.hdf5')
+    read_hdf5('rsc/train_features.hdf5')
 
