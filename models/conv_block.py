@@ -12,7 +12,7 @@ class ConvBlock(nn.Module):
         self.conv = nn.Conv1d(in_channel, out_channel, kernel_size=kernel_size, stride=stride, padding=padding)
         self.max_pool = nn.MaxPool1d(kernel_size, stride=3)
         self.bn = nn.BatchNorm1d(out_channel)
-        self.act = nn.GELU() if act_fn == 'gelu' else nn.ReLU()
+        self.act = nn.ReLU()
         self.dropout = nn.Dropout(dropout)
 
         self.sequential = nn.Sequential(

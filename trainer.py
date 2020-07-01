@@ -148,12 +148,11 @@ def main():
         tr_step, total_loss, mean_loss = 0, 0., 0.
 
         for step, batch in enumerate(iter_bar):
-            feature = batch['feature'].float()
-            label = batch['label'].float()
+            feature = batch['feature'].float().to(device)
+            label = batch['label'].float().to(device)
             output = model(feature)
 
-            loss = F.kl_div(output.log(), label, reduction='batchmean')
-            print(output)
+            loss = -F.kl_div(output, label, reduction='batchmean')
 
             # if n_gpu > 1:
             #     loss = loss.mean()
@@ -177,7 +176,7 @@ def main():
                                      (global_step, num_train_step, mean_loss, loss.item()))
 
             if global_step % 100 == 0:
-                logger.info("output result %d", output)
+                print('output ', output)
                 summary_writer.add_scalar('Train/Total_Mean_Loss', mean_loss, global_step)
                 summary_writer.add_scalar('Train/Total_Loss', loss.item(), global_step)
 
