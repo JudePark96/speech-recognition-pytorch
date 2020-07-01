@@ -5,8 +5,7 @@ import argparse
 import logging
 import os
 import random
-import sys
-
+import torch.nn.functional as F
 import torch.nn as nn
 import numpy as np
 import torch
@@ -17,8 +16,6 @@ from torch.utils.tensorboard import SummaryWriter
 
 from data_loader import SpeechDataset
 from models.concat_sample_cnn_network import SampleCNN
-from models.model import BaselineModel
-from models.tdnn import TDNN
 from optimization import AdamW, WarmupLinearSchedule
 
 
@@ -98,8 +95,8 @@ def main():
     model = SampleCNN()
 
     # Multi-GPU Setting
-    if n_gpu > 1:
-        model = nn.DataParallel(model)
+    # if n_gpu > 1:
+    #     model = nn.DataParallel(model)
 
     num_params = count_parameters(model)
     logger.info("Total Parameter: %d" % num_params)
@@ -142,9 +139,6 @@ def main():
 
     train_dataloader = DataLoader(post_training_dataset, batch_size=args.train_batch_size,
                                   num_workers=16, pin_memory=True)
-
-    kl_loss = nn.KLDivLoss(reduction='batchmean')
-
     model.train()
     global_step = 0
     epoch = 0
@@ -158,10 +152,11 @@ def main():
             label = batch['label'].float()
             output = model(feature)
 
-            loss = kl_loss(output, label)
+            loss = F.kl_div(output.log(), label, reduction='batchmean')
+            print(output)
 
-            if n_gpu > 1:
-                loss = loss.mean()
+            # if n_gpu > 1:
+            #     loss = loss.mean()
 
             if args.fp16:
                 with amp.scale_loss(loss, optimizer) as scaled_loss:
@@ -195,10 +190,10 @@ def main():
 
         logger.info(model_checkpoint)
         output_model_file = os.path.join(args.output_dir, model_checkpoint)
-        if n_gpu > 1:
-            torch.save(model.module.state_dict(), output_model_file)
-        else:
-            torch.save(model.state_dict(), output_model_file)
+        # if n_gpu > 1:
+        #     torch.save(model.module.state_dict(), output_model_file)
+        # else:
+        torch.save(model.state_dict(), output_model_file)
         epoch += 1
 
 
